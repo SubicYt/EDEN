@@ -65,47 +65,53 @@ public:
 			currentChar = inputCode[currentPosition];
 
 			//Handling WhiteSpace
-			if (isspace(static_cast<unsigned char>(currentChar))) {
+		if (isspace(static_cast<unsigned char>(currentChar))) {
 				advance();
 				continue;
-			}
+		}
 
-			//Handling keywords. Rest of keywords to be implemented later on. 
-			if (isalpha(currentChar)) {
-				std::string identifierString = "";
-				while (isalnum) {
-					identifierString.push_back(currentChar);
-					advance();
-					currentChar = inputCode[currentPosition];
-				}
+		//Handling keywords. Rest of keywords to be implemented later on. 
+		if (isalpha(currentChar)) {
+			std::string identifierString = "";
+			while (isalnum) {
+				identifierString.push_back(currentChar);
+				advance();
+				currentChar = inputCode[currentPosition];
+			}
 				/*
 				  if identifier_string is in keywords_map:
 				tokens.add(Token)
 				  else:
 					tokens.add(new Token(IDENTIFIER, identifier_string))
 				*/
-				if (TokenPairs.find(identifierString) != TokenPairs.end()) {
+			if (TokenPairs.find(identifierString) != TokenPairs.end()) {
 					tokenList.push_back(Token(TokenPairs[identifierString], identifierString));
-				}
-				else {
-					tokenList.push_back(Token(IDENTIFIER, identifierString));
-				}
 			}
-			//handling numbers and floats. 
-			if (isdigit(currentChar)) {
-				std::string digitString = "";
-				while (isdigit(currentChar) || currentChar == '.') {
-					digitString.push_back(currentChar);
-					currentPosition++;
-					currentChar = inputCode[currentPosition];
-				}
-				if (TokenPairs.find(digitString) != TokenPairs.end()) {
-					tokenList.push_back(Token(TokenPairs[digitString], digitString));
-				}
+			else {
+					tokenList.push_back(Token(IDENTIFIER, identifierString));
 			}
 		}
+			//handling numbers and floats. 
+		if (isdigit(currentChar)) {
+			std::string digitString = "";
+			while (isdigit(currentChar) || currentChar == '.') {
+				digitString.push_back(currentChar);
+				currentPosition++;
+				currentChar = inputCode[currentPosition];
+			}
+			if (TokenPairs.find(digitString) != TokenPairs.end()) {
+				tokenList.push_back(Token(TokenPairs[digitString], digitString));
+			}
+		}
+
+		//Handle single char math operations + - = / * etc
+		if (currentChar == '+') {
+			tokenList.push_back(Token(PLUS, "+"));
+		}
 	}
+}
 };
-int main(){
-    std::cout<<"yeo"<<std::endl;
+
+int main() {
+	//implement later. 
 }
