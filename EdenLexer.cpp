@@ -1,99 +1,111 @@
 #include <iostream>
 #include <vector>
 #include <string>
-#include <regex>
+#include <map>
 
-enum TokenType{
-    KEYWORD, IDENTIFIER, LITERAL,
-    OPERATOR, PUNCTUATION, ASSIGNMENT,
-    END_OF_FILE, ERROR
+//let int x = 45 + 16;
+enum TokenType {
+	// Single-character tokens
+	LEFT_PAREN, RIGHT_PAREN, PLUS, MINUS, STAR, SLASH, EQUAL, COMMA,
+	// Keywords
+	IF, ELSE, WHILE, FOR, RETURN, TRUE, FALSE,
+	// Multi-character tokens
+	EQUAL_EQUAL, NOT_EQUAL, LESS_EQUAL, GREATER_EQUAL,
+	// Literals
+	ASSIGNMENT, IDENTIFIER, STRING, NUMBER, KEYWORD,
+	// End of file
+	END_OF_FILE
 };
 
-struct Token{
-    TokenType type;
-    std::string value; //used for identifiers and numbers
+struct Token {
+	TokenType type;
+	std::string tokenValue;
+
+	Token(TokenType tk, std::string val) {
+		type = tk;
+		tokenValue = val;
+	}
 };
 
-struct TokenSpec{
-    std::string pattern;
-    TokenType type;
+std::map<std::string, TokenType> TokenPairs{
+	{"let", TokenType::KEYWORD},
+	{"if", TokenType::IF},
+	{"(", TokenType::LEFT_PAREN},
+	{")", TokenType::RIGHT_PAREN}
+	//continue implementation
 };
 
-std::string tokenTypeToString(TokenType type) {
-    switch (type) {
-        case KEYWORD:      return "KEYWORD";
-        case IDENTIFIER:   return "IDENTIFIER";
-        case LITERAL:      return "LITERAL";
-        case OPERATOR:     return "OPERATOR";
-        case PUNCTUATION:  return "PUNCTUATION";
-        case ASSIGNMENT:   return "ASSIGNMENT";
-        case END_OF_FILE:  return "END_OF_FILE";
-        case ERROR:        return "ERROR";
-        default:           return "UNKNOWN";
-    }
-}
-
-class Lexer{
+class lexer {
 private:
-    std::string text;
-    size_t currentPosition = 0;
-    char currentChar; //cached copy of the character at text[pos] or '\0'
+	//input as users source code
+	std::string inputCode;
+	size_t currentPosition;
+	char currentChar;
+
 public:
-    Lexer(std::string& input){
-        text = input;
-        currentPosition = 0;
-    }
-    void advance(){
-        currentPosition++;
-        if(currentPosition < text.size()){
-            currentChar = text[currentPosition];
-        }
-        else{
-            currentChar = '\0'; //null terminator, end of line. 
-        }
-    }
-    Token tokenize(){
-        std::vector<Token> tokenList;
-        while(currentPosition < text.size()){
 
-            currentChar = text[currentPosition];
-            if(isspace(static_cast<unsigned char>(currentChar))){
-                advance();
-                continue;
-            }
-            
-            Token token = nextToken();
-            if(token != null){ // how to null? 
-                tokenList.push_back(token);
-            }else{
-                std::cout<<"Unidentified character " << currentChar << std::endl;
-            }
-        }
-    } 
+	lexer(std::string input) {
+		inputCode = input;
+		currentPosition = 0;
+	}
 
-    Token nextToken(){
-        if (currentPosition >= text.length()){
-            return {END_OF_FILE, ""};
-        }
-        while(currentPosition< text.length() && isspace(text[currentPosition])){
-            advance();
-        }
+	void advance() {
+		currentPosition++;
+		if (currentPosition < inputCode.size()) {
+			currentChar = inputCode[currentPosition];
+		}
+		else {
+			currentChar = '\0';
+		}
+	}
+	
+	Token tokenize() {
+		std::vector<Token> tokenList;
+		while (currentPosition < inputCode.size()) {
+			currentChar = inputCode[currentPosition];
 
-        //list of token patterns and their types
-        std::vector<TokenSpec> tokenSpecs = {
-        { "if|else|while|for", TokenType::KEYWORD },
-        { "let",               TokenType::ASSIGNMENT },
-        { "[a-zA-Z_][a-zA-Z0-9_]*", TokenType::IDENTIFIER },
-        { "\\d+",              TokenType::LITERAL },
-        { "[+-/*=<>!]",        TokenType::OPERATOR },
-        { "[.,;(){}]",         TokenType::PUNCTUATION }
-    };
+			//Handling WhiteSpace
+			if (isspace(static_cast<unsigned char>(currentChar))) {
+				advance();
+				continue;
+			}
 
-    //Match the token descriptors to the token type. 
-    //implement later 
-    }
+			//Handling keywords. Rest of keywords to be implemented later on. 
+			if (isalpha(currentChar)) {
+				std::string identifierString = "";
+				while (isalnum) {
+					identifierString.push_back(currentChar);
+					advance();
+					currentChar = inputCode[currentPosition];
+				}
+				/*
+				  if identifier_string is in keywords_map:
+				tokens.add(Token)
+				  else:
+					tokens.add(new Token(IDENTIFIER, identifier_string))
+				*/
+				if (TokenPairs.find(identifierString) != TokenPairs.end()) {
+					tokenList.push_back(Token(TokenPairs[identifierString], identifierString));
+				}
+				else {
+					tokenList.push_back(Token(IDENTIFIER, identifierString));
+				}
+			}
+			//handling numbers and floats. 
+			if (isdigit(currentChar)) {
+				std::string digitString = "";
+				while (isdigit(currentChar) || currentChar == '.') {
+					digitString.push_back(currentChar);
+					currentPosition++;
+					currentChar = inputCode[currentPosition];
+				}
+				if (TokenPairs.find(digitString) != TokenPairs.end()) {
+					tokenList.push_back(Token(TokenPairs[digitString], digitString));
+				}
+			}
+		}
+	}
 };
-
 int main(){
     std::cout<<"yeo"<<std::endl;
 }
