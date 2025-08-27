@@ -5,8 +5,6 @@
 #include <fstream>
 #include <stdexcept>
 
-//let int x = 45 + 16;
-
 
 enum TokenType {
 	// Single-character tokens
@@ -38,7 +36,9 @@ std::string tokenTypeToString(TokenType type) {
         case IF:           return "IF";
         case LEFT_PAREN:   return "LEFT_PAREN";
         case RIGHT_PAREN:  return "RIGHT_PAREN";
+        case EQUAL:        return "EQUAL";
         case LET:          return "KEYWORD";
+        case STRING:       return "STRING";
         default:           return "UNKNOWN";
     }
 }
@@ -195,8 +195,8 @@ int main() {
     std::vector<Token>TokenList = Lexer.tokenize();
 
     for(int i = 0; i<TokenList.size(); i ++){
-        tokenOut << tokenTypeToString(TokenList[i].type) 
-        << " "<<TokenList[i].tokenValue << ", "<< std::endl;
+        tokenOut << "{"<< tokenTypeToString(TokenList[i].type) 
+        << ", "<<TokenList[i].tokenValue<<"}" << ", ";
     }
 
     tokenOut.close();
