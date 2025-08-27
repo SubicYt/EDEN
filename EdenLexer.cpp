@@ -10,7 +10,7 @@ enum TokenType {
 	// Single-character tokens
 	LEFT_PAREN, RIGHT_PAREN, PLUS, MINUS, STAR, SLASH, EQUAL, COMMA,
 	// Keywords
-	IF, ELSE, WHILE, FOR, RETURN, TRUE, FALSE, LET,
+	IF, ELSE, WHILE, FOR, RETURN, TRUE, FALSE,
 	// Multi-character tokens
 	EQUAL_EQUAL, NOT_EQUAL, LESS_EQUAL, GREATER_EQUAL, SLASH_SLASH ,
 	// Literals
@@ -37,7 +37,6 @@ std::string tokenTypeToString(TokenType type) {
         case LEFT_PAREN:   return "LEFT_PAREN";
         case RIGHT_PAREN:  return "RIGHT_PAREN";
         case EQUAL:        return "EQUAL";
-        case LET:          return "KEYWORD";
         case STRING:       return "STRING";
         default:           return "UNKNOWN";
     }
@@ -45,6 +44,7 @@ std::string tokenTypeToString(TokenType type) {
 
 std::map<std::string, TokenType> TokenPairs{
 	{"let", TokenType::KEYWORD},
+    {"var", TokenType::KEYWORD},
 	{"if", TokenType::IF},
 	{"(", TokenType::LEFT_PAREN},
 	{")", TokenType::RIGHT_PAREN}, 
@@ -199,6 +199,9 @@ int main() {
         << ", "<<TokenList[i].tokenValue<<"}" << ", ";
     }
 
+    tokenOut.close();
+    return 0;
+}
     tokenOut.close();
     return 0;
 }
