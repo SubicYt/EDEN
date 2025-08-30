@@ -160,7 +160,7 @@ public:
         return Token(STRING, "stringLiteral");
     }
 
-    Token handleNumber() {
+    Token handleNumber() { 
         std::string digitString = "";
         while (isdigit(static_cast<unsigned char>(currentChar))) {
             digitString.push_back(currentChar);
@@ -172,6 +172,33 @@ public:
     Token handleSingleDoubleChars() {
         char firstChar = currentChar;
         advance();
+        switch (firstChar) {
+        case '+': return Token(PLUS, "+");
+        case '-': return Token(MINUS, "-");
+        case '*': return Token(STAR, "*");
+        case '/':
+            if (currentChar == '/') {
+                advance();
+                while (currentChar != '\0' && currentChar != '\n') {
+                    advance();
+                }
+                //// Recurse to handle the next token after the comment
+                return handleSingleDoubleChars();
+            }
+            return Token(SLASH, "/");
+        case '=':
+            if (currentChar == '=') {
+                advance();
+                return Token(EQUAL_EQUAL, "==");
+            }
+            return Token(EQUAL, "=");
+        
+        case '(': return Token(LEFT_PAREN, "(");
+        case ')': return Token(RIGHT_PAREN, ")");
+        case ';': return Token(SEMI_COLON, ";");
+        default:
+            throw std::runtime_error("unkown single character token");
+        }
     }
 };
 
