@@ -1,0 +1,127 @@
+The logic and program structure for the lexer 
+// Define an enumeration for the token types
+
+enum TokenType {
+  // Single-character tokens
+  LEFT_PAREN, RIGHT_PAREN, PLUS, MINUS, STAR, SLASH, EQUAL, COMMA,
+  
+  // Keywords
+  IF, ELSE, WHILE, FOR, RETURN, TRUE, FALSE, NULL,
+  
+  // Multi-character tokens
+  EQUAL_EQUAL, NOT_EQUAL, LESS_EQUAL, GREATER_EQUAL,
+  
+  // Literals
+  IDENTIFIER, STRING, NUMBER,
+  
+  // End of file
+  EOF
+}
+
+// Define the Token structure
+class Token {
+  TokenType type
+  string lexeme
+  // You might also add a value or line number
+}
+
+// Create a map to store keywords
+keywords_map = new Map<string, TokenType>()
+
+// Populate the map with your language's keywords
+keywords_map.insert("if", TokenType.IF)
+keywords_map.insert("else", TokenType.ELSE)
+keywords_map.insert("while", TokenType.WHILE)
+keywords_map.insert("for", TokenType.FOR)
+keywords_map.insert("return", TokenType.RETURN)
+keywords_map.insert("true", TokenType.TRUE)
+keywords_map.insert("false", TokenType.FALSE)
+
+
+function tokenize(source_code):
+  tokens = []
+  current_position = 0
+
+  while current_position < length(source_code):
+    current_char = source_code[current_position]
+
+    // Skip whitespace
+    if is_whitespace(current_char):
+      current_position++
+      continue
+
+    // Handle single-character tokens (e.g., +, -, *, /, =, (, ), {, })
+    if current_char is '+':
+      tokens.add(new Token(PLUS, "+"))
+      current_position++
+    else if current_char is '-':
+      tokens.add(new Token(MINUS, "-"))
+      current_position++
+    // ... and so on for other single-character symbols
+
+
+
+
+
+
+    // Handle multi-character tokens (e.g., ==, !=, <=, >=)
+    else if current_char is '=':
+      if next_char is '=':
+        tokens.add(new Token(EQUAL_EQUAL, "=="))
+        current_position += 2
+      else:
+        tokens.add(new Token(EQUAL, "="))
+        current_position++
+
+
+
+
+    // Handle numbers (integers and floats)
+    else if is_digit(current_char):
+      number_string = ""
+      while is_digit(current_char) or current_char is '.':
+        number_string += current_char
+        current_position++
+        current_char = source_code[current_position]
+      
+      tokens.add(new Token(NUMBER, number_string))
+
+
+
+
+
+    // Handle identifiers (variable names, keywords)
+    else if is_letter(current_char):
+      identifier_string = ""
+      while is_alphanumeric(current_char):
+        identifier_string += current_char
+        current_position++
+        current_char = source_code[current_position]
+      
+      // Check if the identifier is a reserved keyword (e.g., 'if', 'else', 'for')
+      if identifier_string is in keywords_map:
+        tokens.add(new Token(keywords_map[identifier_string], identifier_string))
+      else:
+        tokens.add(new Token(IDENTIFIER, identifier_string))
+
+    // Handle strings
+    else if current_char is '"':
+      current_position++ // Move past the opening quote
+      string_literal = ""
+      while current_char != '"' and current_position < length(source_code):
+        string_literal += current_char
+        current_position++
+        current_char = source_code[current_position]
+      
+      // Handle missing closing quote error
+      if current_char != '"':
+        // Handle an error (e.g., throw an exception)
+      
+      tokens.add(new Token(STRING, string_literal))
+      current_position++ // Move past the closing quote
+
+    else:
+      // Handle an unrecognized character error
+      // e.g., throw an exception or log an error
+
+  return tokens

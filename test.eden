@@ -1,0 +1,2 @@
+var let x = "hello"
+print("hello")

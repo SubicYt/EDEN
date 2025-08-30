@@ -1,0 +1,1 @@
+{KEYWORD, var}, {KEYWORD, let}, {IDENTIFIER, vedant}, {EQUAL, =}, {STRING, Ethan}, {SEMI_COLON, ;}, {UNKNOWN, }, 
