@@ -1,0 +1,23 @@
+notes on cmake
+
+See file for my CmakeConfig for this project
+
+when running: 
+mkdir build -> user inputted src code goes in here
+
+cmake -S . -B build/ ---> build files written to build directory
+
+cmake --build build/ ---> building... goes to ./build/Debug/eden 
+
+^^^^^^^^^^^ visual studio automatically sends eden executable (eden.exe) to the debug file
+
+so it goes ./build/Debug/(my custom executable) to run the program.
+
+in my case i expect a cmdline argument of whatever the user inputted source code file is.
+
+in my case "test.eden" or any arbitrary file with .eden extension
+
+to run an eden file it goes. 
+
+./build/Debug/eden HelloWorld.eden
+
