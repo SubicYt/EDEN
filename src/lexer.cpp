@@ -180,3 +180,4 @@ Token lexer::handleSingleDoubleChars() {
     }
 }
 
+//this code isnt up to date.
