@@ -21,8 +21,8 @@ enum TokenType {
     EQUAL_EQUAL, NOT_EQUAL, LESS_EQUAL, GREATER_EQUAL, SLASH_SLASH,
     // Literals
     ASSIGNMENT, IDENTIFIER, STRING, NUMBER, KEYWORD,
-    // End of file
-    END_OF_FILE
+    // End of line and file
+    NULL_TERMINATOR, END_OF_FILE
 };
 
 struct Token {
@@ -51,7 +51,7 @@ public:
     Token handleString();
     Token handleNumber();
     Token handleSingleDoubleChars();
-
+    Token handleNullTerminator();
 };
 
-#endif LEXER_H
+#endif // LEXER_H
