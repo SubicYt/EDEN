@@ -16,7 +16,8 @@ std::map<std::string, TokenType> TokenPairs{
     {";", TokenType::SEMI_COLON},
     {")", TokenType::RIGHT_PAREN},
     {"+", TokenType::PLUS},
-    {"-", TokenType::MINUS}
+    {"-", TokenType::MINUS},
+    {"\0", TokenType::NULL_TERMINATOR}
 };
 
 Token::Token(TokenType tk, std::string val) {
@@ -34,6 +35,7 @@ std::string tokenTypeToString(TokenType type) {
     case EQUAL:        return "EQUAL";
     case STRING:       return "STRING";
     case SEMI_COLON:   return "SEMI_COLON";
+    case NULL_TERMINATOR: return "NULL_TERMINATOR";
     default:           return "UNKNOWN";
     }
 }
@@ -65,21 +67,26 @@ void lexer::handleWhiteSpace() {
     }
 }
 
+Token lexer::handleNullTerminator(){
+    return Token(NULL_TERMINATOR, "\0");
+}
+
 std::vector<Token>  lexer::tokenize() {
     std::vector<Token> tokenList; // append tokens here for abs tree.
     while (currentChar != '\0') {
         handleWhiteSpace();
 
         if (currentChar == '\0') {
+            tokenList.push_back(handleNullTerminator());
             break;
         }
         //handle single char math operators
         if (currentChar == '+' || currentChar == '-' || currentChar == '*' || currentChar == '/'
-            || currentChar == '=' || currentChar == '++' || currentChar == '--' || currentChar == '=='
-            || currentChar == '(' || currentChar == ')' || currentChar == '//') {
+            || currentChar == '=' || currentChar == ';') {
             tokenList.push_back(handleSingleDoubleChars());
             continue;
         }
+
         if (isalpha(static_cast<unsigned char>(currentChar))) {
             tokenList.push_back(handleIdentifierOrKeyword());
         }
@@ -89,9 +96,13 @@ std::vector<Token>  lexer::tokenize() {
         else if (currentChar == '"') {
             tokenList.push_back(handleString());
         }
+        else if (currentChar == ';'){
+            tokenList.push_back(Token(SEMI_COLON, ";"));
+            break;
+        }
         else {
             std::cerr << "Error: Unrecognized character '" << currentChar << "' at position " << currentPosition << std::endl;
-            // For now, we'll just advance to the next character. A real compiler would probably exit or record the error.
+            // For now just advance to next char
             advance();
         }
     }
@@ -117,12 +128,12 @@ Token lexer::handleIdentifierOrKeyword() {
 Token lexer::handleString() {
     std::string stringLiteral = "";
     advance(); // skip the white space;
-    while (isalnum(static_cast<unsigned char>(currentChar)) && currentChar != '"' && currentChar != '\0') {
+    while (isalnum(static_cast<unsigned char>(currentChar)) && currentChar != '"') {
         stringLiteral.push_back(currentChar);
         advance();
     }
     if (currentChar != '"') {
-       throw std::runtime_error("String literal not closed ---- >  ");
+    throw std::runtime_error("String literal not closed ---- >  ");
     }
     advance(); // moves one past closing quote
     return Token(STRING, "stringLiteral");
@@ -168,6 +179,4 @@ Token lexer::handleSingleDoubleChars() {
         throw std::runtime_error("unkown single character token");
     }
 }
-
-
 
