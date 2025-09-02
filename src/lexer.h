@@ -10,15 +10,20 @@
 #include <sstream>
 #include <cctype>
 
+//PROPER DATA TYPE TOKENS ARE TO BE IMPLEMENTED.
+
 
 enum TokenType {
     // Single-character tokens
-    LEFT_PAREN, RIGHT_PAREN, PLUS, MINUS, STAR, SLASH, EQUAL, COMMA,
-    SEMI_COLON,
+    LEFT_PAREN, LEFT_BRACKET, RIGHT_BRACKET, RIGHT_PAREN, 
+    PLUS, MINUS, STAR, SLASH, EQUAL, L_THAN, G_THAN,
+    COMMA,
+    SEMI_COLON, 
     // Keywords
     IF, ELSE, WHILE, FOR, RETURN, TRUE, FALSE,
     // Multi-character tokens
     EQUAL_EQUAL, NOT_EQUAL, LESS_EQUAL, GREATER_EQUAL, SLASH_SLASH,
+    PLUS_PLUS, MINUS_MINUS, 
     // Literals
     ASSIGNMENT, IDENTIFIER, STRING, NUMBER, KEYWORD,
     // End of line and file
