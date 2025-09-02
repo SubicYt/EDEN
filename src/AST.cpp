@@ -49,6 +49,20 @@ struct binaryExpression : expr{
             //std::move effectively moves resources from var to var
             left = std::move(left_pointer);
             right = std::move(right_pointer);
-            operation = oper_str;
+            operation = std::move(oper_str);
         }
+};
+
+struct identifier : expr{
+    std::string symbol;
+    identifier(std::string s) : expr(NodeType::IDENTIFIER){
+        symbol = std::move(s);
+    }
+};
+
+struct numericLiteral : expr{
+    double value;
+    numericLiteral(double val) : expr(NodeType::NUMERIC_LITERAL){
+        value = val;
+    }
 };
