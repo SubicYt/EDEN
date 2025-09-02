@@ -37,6 +37,7 @@ std::string tokenTypeToString(TokenType type) {
     case KEYWORD:      return "KEYWORD";
     case IDENTIFIER:   return "IDENTIFIER";
     case IF:           return "IF";
+    case END_OF_FILE:  return "END OF FILE";
 
     case LEFT_PAREN:   return "LEFT_PAREN";
     case RIGHT_PAREN:  return "RIGHT_PAREN";

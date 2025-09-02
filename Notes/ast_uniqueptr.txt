@@ -26,7 +26,7 @@ When you try to add a derived object, like NumericLiteral, to this vector:
 std::vector<Stmt> statements;
 NumericLiteral num_node(123.45);
 
-// 💥 PROBLEM HERE 💥
+// PROBLEM HERE 
 statements.push_back(num_node); 
 C++ will "slice" the num_node object to make it fit. 
 It copies only the Stmt part of your NumericLiteral into the vector's memory slot 

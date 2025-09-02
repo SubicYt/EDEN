@@ -1,8 +1,12 @@
+#ifndef AST_H
+#define AST_H
+
 #include <iostream>
 #include <list>
 #include <algorithm>
 #include <memory>
 #include <vector>
+
 //var let x = 45; will not return a value
 // x = 45, assignment, will return value
 
@@ -25,10 +29,11 @@ struct statement{
 };
 
 struct program : statement{
-    //array or vector idk whatever of unique statement objects
+    //vector of unique statement objects
     //prevents object slicing
     // see notes doc for explanation
     std::vector<std::unique_ptr<statement>> programBody;
+    
     //program constructors 
     program() : statement(NodeType::PROGRAM){}
 };
@@ -66,3 +71,5 @@ struct numericLiteral : expr{
         value = val;
     }
 };
+
+#endif // AST_H
