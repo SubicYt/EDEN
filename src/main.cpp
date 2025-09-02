@@ -7,7 +7,6 @@
 
 //vscode is for soyboys.
 
-
 //supporting commandline agruments idk how ts works bro. 
 int main(int argc, char* argv[]) {
 	if (argc != 2) {

@@ -1,0 +1,64 @@
+why do we make a vector of unique pointers and not just statement objects?
+
+You can't use a vector of statement objects because of a C++ problem called object slicing, 
+which happens when you work with class inheritance (polymorphism).
+
+The short answer is: a std::vector<Stmt> would chop off all the unique data from your derived nodes 
+(like NumericLiteral and BinaryExpr), 
+defeating the purpose of your AST.
+
+The Problem: Object Slicing
+Your goal is to have a single list that can hold different kinds of statements: 
+NumericLiteral, Identifier, BinaryExpr, etc. All these are derived from the base Stmt class, 
+but they have different sizes and different member variables.
+
+Identifier needs to store a std::string symbol.
+
+NumericLiteral needs to store a double value.
+
+BinaryExpr needs to store pointers to its left and right children.
+
+A std::vector<Stmt> allocates a sequence of memory where each slot is exactly the size of a plain Stmt object.
+
+When you try to add a derived object, like NumericLiteral, to this vector:
+
+// This is what you CAN'T do
+std::vector<Stmt> statements;
+NumericLiteral num_node(123.45);
+
+// 💥 PROBLEM HERE 💥
+statements.push_back(num_node); 
+C++ will "slice" the num_node object to make it fit. 
+It copies only the Stmt part of your NumericLiteral into the vector's memory slot 
+and discards all the parts that made it a NumericLiteral, including the value member.
+
+You're left with a generic Stmt object, losing the specific data and type information that was critical. 
+All your different nodes would become indistinguishable, and your AST would be useless.
+
+The Solution: Using Pointers
+Pointers solve this problem perfectly. A pointer is just a memory address. 
+The size of a pointer is always the same, regardless of what it points to.
+
+When you create a std::vector<std::unique_ptr<Stmt>>, 
+the vector doesn't store the bulky objects themselves. It stores slim, uniformly-sized pointers to those objects, 
+which live elsewhere in memory.
+
+// This is the correct way
+std::vector<std::unique_ptr<Stmt>> statements;
+
+// Create a new NumericLiteral on the heap and store a pointer to it
+statements.push_back(std::make_unique<NumericLiteral>(123.45));
+This works because:
+
+No Slicing: The original, complete NumericLiteral object is preserved in memory. The vector only stores its address.
+
+Polymorphism Works: You can call virtual functions on these pointers, and C++ will correctly invoke the function for the actual object's type (NumericLiteral, BinaryExpr, etc.).
+
+Why std::unique_ptr?
+We use a "smart pointer" like std::unique_ptr instead of a raw pointer (Stmt*) for automatic memory management.
+
+Raw Pointers (Stmt*): You would be responsible for manually calling delete on every single node you created with new. 
+Forgetting to do this is a classic way to cause memory leaks.
+
+Smart Pointers (std::unique_ptr): This pointer automatically deletes the object it points to when it goes out of scope (for example, when the vector is destroyed). 
+This makes your code much safer and easier to manage, preventing memory leaks entirely. It's the modern, idiomatic C++ approach.
