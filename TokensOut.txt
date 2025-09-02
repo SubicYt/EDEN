@@ -1,1 +1,0 @@
-{KEYWORD, var}, {KEYWORD, let}, {IDENTIFIER, x}, {EQUAL, =}, {STRING, stringLiteral}, {SEMI_COLON, ;}, {UNKNOWN, }, 
