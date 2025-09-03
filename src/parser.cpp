@@ -11,50 +11,72 @@
 #include <cctype>
 
 class Parser{
+private:
+    //takes tokens from lexer. 
     std::vector<Token> tokens;
-    size_t currentPosition;
 
-    private:
-        bool not_eof(){
-            tokens[0].type = TokenType::END_OF_FILE;
+    bool not_eof(){
+        //evals to true. we are out of tokens to parse.
+        return tokens[0].type != TokenType::END_OF_FILE;
+    }
+    //keeps track of index 0;
+    Token at(){
+        return tokens[0];
+    }
+
+    //return previous token and increment
+    Token advance(){
+        //first check empty
+        if(tokens.empty()){
+            throw std::out_of_range("tokens are empty");
+        }
+        auto prev = tokens.front();
+        tokens.erase(tokens.begin());
+        return prev;
+    }
+
+    //entry point for parser.
+    std::unique_ptr<statement> parse_statement(){
+        //already delt with program which is only statment - only expressions to parse
+        //in the future will implement funclaration declaration, variable dec, while loops, etc.
+        return parse_expr();
+    }
+
+    std::unique_ptr<expr> parse_expr(){
+        return parse_primary();
+    }
+
+    std::unique_ptr<expr> parse_primary(){
+        auto tk = at().type;
+        switch(tk){
+            case TokenType::IDENTIFIER:
+            return std::make_unique<expr>(IDENTIFIER, advance().tokenValue);
+
+            case TokenType::NUMBER:
+            return std::make_unique<expr>(NUMERIC_LITERAL, 
+                //parse to float
+                std::stof(advance().tokenValue));
+
+            default: 
+            return 0;
         }
 
-        Token at(){
-            return tokens[0];
-        }
-
-        std::unique_ptr<statement> parseStatement(){
-            return parseExpression();
-        }
-
-        std::unique_ptr<expr> parseExpression(){
-            
-        }
-
-        //parse primary expressions first
-        //i.e numberic literals and identifiers;
-
-        std::unique_ptr<expr> parsePrimaryExpression(){
-            //determine wether numeric literal or identifier first
-            const auto tk = at().type;
-            
-            switch(tk){
-                case TokenType::IDENTIFIER:
-                return std::make_unique<expr>(IDENTIFIER, at().tokenValue);
-            //implement further
-        }
     }
 
 public:
+    std::unique_ptr<program> produceAST(std::string sourceCode){
+        //able to produce an AST of type program 
+        //where each element in the program body is an array of statements. 
+        auto Program = std::make_unique<program>();
+        lexer Lexer(sourceCode);
+        tokens = Lexer.tokenize();
 
-    std::unique_ptr<program> produceAST (const std::string& sourceCode){
-            lexer Lexer(sourceCode);
-            std::vector<Token>tokens;
-            tokens = Lexer.tokenize();
-
-            auto Program = std::make_unique<program>();
-            while(not_eof()){
-                Program -> programBody.push_back(parseStatement());
-            }
+        //parse until end of file
+        while(not_eof()){
+            Program -> programBody.push_back(parse_statement());
         }
+
+        return Program;
+    }
+
 };

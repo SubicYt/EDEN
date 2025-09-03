@@ -1,0 +1,8 @@
+Statement is - syntactic unit that expresses an action to be carried out within a program. 
+It is a complete instruction given to the computer to perform a specific task. 
+
+Expression is - a combination of literals, variables, operators, 
+and function calls that evaluates to a single value. 
+It represents a computation and can be as simple as a single variable 
+or as complex as a mathematical equation or a function call. 
+
