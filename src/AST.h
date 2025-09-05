@@ -15,7 +15,7 @@
 enum NodeType{
     PROGRAM,
     NUMERIC_LITERAL,
-    IDENTIFIER,
+    IDENTIFIER_EXPR,
     BINARY_EXPRESSION
 };
 
@@ -40,8 +40,10 @@ struct program : statement{
     program() : statement(PROGRAM){}
 };
 
+//Specialized expr base class
 struct expr : statement{
-    expr(NodeType node_type) : statement(node_type){};
+    virtual ~expr() = default;
+    expr(NodeType nodetype) : statement(nodetype){};
 };
 
 struct binaryExpression : expr{
@@ -52,7 +54,7 @@ struct binaryExpression : expr{
 
     binaryExpression(std::unique_ptr<expr>left_pointer, 
         std::unique_ptr<expr>right_pointer, std::string oper_str) : 
-        expr(NodeType::BINARY_EXPRESSION){
+        expr(BINARY_EXPRESSION){
             //std::move effectively just moves resources from var to var
             left = std::move(left_pointer);
             right = std::move(right_pointer);
@@ -62,14 +64,14 @@ struct binaryExpression : expr{
 
 struct identifier : expr{
     std::string symbol;
-    identifier(const std::string& sym) : expr(IDENTIFIER){
-        symbol = std::move(s);
+    identifier(const std::string& sym) : expr(IDENTIFIER_EXPR){
+        symbol = std::move(sym);
     }
 };
 
 struct numericLiteral : expr{
     double value;
-    numericLiteral(double val) : expr(NodeType::NUMERIC_LITERAL){
+    numericLiteral(double val) : expr(NUMERIC_LITERAL){
         value = val;
     }
 };

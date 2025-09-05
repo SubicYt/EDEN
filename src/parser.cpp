@@ -54,13 +54,13 @@ private:
 
         auto tk = at().type;
         switch(tk){
-            case TokenType::IDENTIFIER:
-            return std::make_unique<expr>(NodeType::IDENTIFIER, advance().tokenValue);
+            case IDENTIFIER:
+            return std::make_unique<expr>(IDENTIFIER, advance().tokenValue);
 
-            case TokenType::NUMBER:
-            return std::make_unique<expr>(NodeType::NUMERIC_LITERAL, 
-                //parse to float
-                std::stof(advance().tokenValue));
+            case NUMBER:
+            return std::make_unique<expr>(NUMERIC_LITERAL, 
+            //parse to float
+            std::stof(advance().tokenValue));
             
             default: 
             throw std::runtime_error("Unexpected token during parsing - >");
