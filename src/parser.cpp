@@ -10,6 +10,9 @@
 #include <sstream>
 #include <cctype>
 
+//implement binary expressions.
+
+
 class Parser{
 private:
     //takes tokens from lexer. 
@@ -47,23 +50,26 @@ private:
     }
 
     std::unique_ptr<expr> parse_primary(){
+        //fix switch statement
+
         auto tk = at().type;
         switch(tk){
             case TokenType::IDENTIFIER:
-            return std::make_unique<expr>(IDENTIFIER, advance().tokenValue);
+            return std::make_unique<expr>(NodeType::IDENTIFIER, advance().tokenValue);
 
             case TokenType::NUMBER:
-            return std::make_unique<expr>(NUMERIC_LITERAL, 
+            return std::make_unique<expr>(NodeType::NUMERIC_LITERAL, 
                 //parse to float
                 std::stof(advance().tokenValue));
-
+            
             default: 
-            return 0;
+            throw std::runtime_error("Unexpected token during parsing - >");
+            std::cout<<at().tokenValue;
         }
-
     }
 
 public:
+
     std::unique_ptr<program> produceAST(std::string sourceCode){
         //able to produce an AST of type program 
         //where each element in the program body is an array of statements. 
@@ -75,8 +81,7 @@ public:
         while(not_eof()){
             Program -> programBody.push_back(parse_statement());
         }
-
         return Program;
     }
-
 };
+

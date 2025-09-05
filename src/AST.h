@@ -1,3 +1,5 @@
+//FIX AST AND PARSER STRUCTURE.
+
 #ifndef AST_H
 #define AST_H
 
@@ -33,9 +35,9 @@ struct program : statement{
     //prevents object slicing
     // see notes doc for explanation
     std::vector<std::unique_ptr<statement>> programBody;
-    
+
     //program constructors 
-    program() : statement(NodeType::PROGRAM){}
+    program() : statement(PROGRAM){}
 };
 
 struct expr : statement{
@@ -51,7 +53,7 @@ struct binaryExpression : expr{
     binaryExpression(std::unique_ptr<expr>left_pointer, 
         std::unique_ptr<expr>right_pointer, std::string oper_str) : 
         expr(NodeType::BINARY_EXPRESSION){
-            //std::move effectively moves resources from var to var
+            //std::move effectively just moves resources from var to var
             left = std::move(left_pointer);
             right = std::move(right_pointer);
             operation = std::move(oper_str);
@@ -60,7 +62,7 @@ struct binaryExpression : expr{
 
 struct identifier : expr{
     std::string symbol;
-    identifier(std::string s) : expr(NodeType::IDENTIFIER){
+    identifier(const std::string& sym) : expr(IDENTIFIER){
         symbol = std::move(s);
     }
 };

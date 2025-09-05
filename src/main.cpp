@@ -3,8 +3,9 @@
 #include <stdexcept>
 #include <sstream>
 #include <vector>
-#include "lexer.h"
 
+#include "lexer.h"
+#include "AST.h"
 //vscode is for soyboys.
 
 //supporting commandline agruments idk how ts works bro. 
@@ -31,6 +32,8 @@ int main(int argc, char* argv[]) {
 	lexer Lexer(sourceCode);
 	std::vector<Token> sourceTokens;
 	sourceTokens = Lexer.tokenize();
+
+	
 
 	for (size_t i = 0; i < sourceTokens.size(); i++) {
 		output << "{" << tokenTypeToString(sourceTokens[i].type)
