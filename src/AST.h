@@ -1,75 +1,113 @@
-#ifndef AST_H
-#define AST_H
+#ifndef ASH_H
+#define ASH_H
 
 #include <iostream>
-#include <list>
-#include <algorithm>
-#include <memory>
 #include <vector>
+#include <string>
+#include <memory>
+#include "lexer.h"
+#include <variant>
 
-//var let x = 45; will not return a value
-// x = 45, assignment, will return value
-
-enum NodeType{
+enum nodeType{
     PROGRAM,
-    NUMERIC_LITERAL,
-    IDENTIFIER,
-    BINARY_EXPRESSION
+    STATEMENT,
+    IDENTIFIER_EXPR,
+    BINARY_EXPR,
+    NUMERIC_LITERAL
 };
+
+/*
+everything is a statement
+Program extends from a statement
+
+Design practice would be to make an expression its own class extedning from base  class statement
+
+Additionally an expression extends from a statement
+An identifier and numeric literal extend from expression
+
+hope and pray bro... hope and pray
+*/
 
 struct statement{
-    NodeType statementKind;
-
-    statement(NodeType nodetype){
-        statementKind = nodetype; 
-    }
-
-    //virtual deconstructor
-    virtual ~statement() = default;
-};
-
-struct program : statement{
-    //vector of unique statement objects
-    //prevents object slicing
-    // see notes doc for explanation
-    std::vector<std::unique_ptr<statement>> programBody;
+    nodeType statementKind;
     
-    //program constructors 
-    program() : statement(NodeType::PROGRAM){}
+    statement(nodeType kind){
+        statementKind = kind;
+    }
+    ~statement() = default; // include virtual destructor
 };
 
-struct expr : statement{
-    expr(NodeType node_type) : statement(node_type){};
+struct program : public statement{
+    //a program is made up of a vector of unique pointers of statements
+    //this is going to prevent object slicing.
+
+    //potential usecase.
+    std::variant<nodeType, std::string> progamValues;
+
+    std::vector<std::unique_ptr<statement>> programBody;
+    program() : statement(PROGRAM){};
+    /*
+    Kinda like
+    progarm(){
+        statementKind = PROGRAM;
+    }
+    */
 };
 
-struct binaryExpression : expr{
-    //left pointer, right pointer, operation
+struct expr : public statement{
+    //an expression is a statement
+    //an expression can be an identifier, binary expression, or numeric literal
+
+    //value of the expression
+    //for binary expression this is operator
+    std::variant<nodeType, std::string> nodeValue; 
+    //variant can hold either a nodeType (for operators) or a string (for identifiers)
+    expr(nodeType kind, std::variant<nodeType, std::string> val) : 
+    statement(kind), nodeValue(val) {};
+
+    /*
+    Just for my own understanding its kinda like this 
+
+    expr(nodeType kind, std::variant<nodeType, std::string> val){
+        statementKind = kind;
+        nodeValue = val;
+    }
+    */
+    ~expr() = default; // include virtual destructor
+};
+
+struct identifier : public expr{
+    std::string symbol;
+
+    identifier(std::string& sym) : expr(IDENTIFIER_EXPR){
+        symbol = std::move(sym);
+    }
+    //no virtual destructor needed since expr already has one
+};
+
+struct binaryExpression : public expr{
     std::unique_ptr<expr> left;
     std::unique_ptr<expr> right;
     std::string operation;
 
-    binaryExpression(std::unique_ptr<expr>left_pointer, 
-        std::unique_ptr<expr>right_pointer, std::string oper_str) : 
-        expr(NodeType::BINARY_EXPRESSION){
-            //std::move effectively moves resources from var to var
-            left = std::move(left_pointer);
-            right = std::move(right_pointer);
-            operation = std::move(oper_str);
-        }
-};
-
-struct identifier : expr{
-    std::string symbol;
-    identifier(std::string s) : expr(NodeType::IDENTIFIER){
-        symbol = std::move(s);
+    binaryExpression(std::unique_ptr<expr> l, std::unique_ptr<expr> r, 
+    std::string& op) : expr(BINARY_EXPR){
+        left = std::move(l);
+        right = std::move(r);
+        operation = std::move(op);
     }
 };
 
-struct numericLiteral : expr{
+struct numericLiteral : public expr{
     double value;
-    numericLiteral(double val) : expr(NodeType::NUMERIC_LITERAL){
+    numericLiteral(double val) : expr(NUMERIC_LITERAL){
         value = val;
     }
 };
 
-#endif // AST_H
+//parser class to be implemented.
+class Parser{
+
+};
+
+#endif // ASH_H
