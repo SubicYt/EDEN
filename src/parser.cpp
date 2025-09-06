@@ -18,7 +18,8 @@ private:
     //takes tokens from lexer. 
     std::vector<Token> tokens;
 
-    bool not_eof(){
+
+    bool Parser::not_eof(){
         //evals to true. we are out of tokens to parse.
         return tokens[0].type != TokenType::END_OF_FILE;
     }
@@ -28,7 +29,7 @@ private:
     }
 
     //return previous token and increment
-    Token advance(){
+    Token Parser::advance(){
         //first check empty
         if(tokens.empty()){
             throw std::out_of_range("tokens are empty");
@@ -39,28 +40,26 @@ private:
     }
 
     //entry point for parser.
-    std::unique_ptr<statement> parse_statement(){
+    std::unique_ptr<statement> Parser::parse_statement(){
         //already delt with program which is only statment - only expressions to parse
         //in the future will implement funclaration declaration, variable dec, while loops, etc.
         return parse_expr();
     }
 
-    std::unique_ptr<expr> parse_expr(){
+    std::unique_ptr<expr> Parser::parse_expr(){
         return parse_primary();
     }
 
-    std::unique_ptr<expr> parse_primary(){
+    std::unique_ptr<expr> Parser::parse_primary(){
         //fix switch statement
 
         auto tk = at().type;
         switch(tk){
             case IDENTIFIER:
-            return std::make_unique<expr>(IDENTIFIER, advance().tokenValue);
-
+            return std::make_unique<expr>(IDENTIFIER_EXPR);
+            
             case NUMBER:
-            return std::make_unique<expr>(NUMERIC_LITERAL, 
-            //parse to float
-            std::stof(advance().tokenValue));
+            return std::make_unique<expr>(NUMERIC_LITERAL);
             
             default: 
             throw std::runtime_error("Unexpected token during parsing - >");
@@ -70,7 +69,9 @@ private:
 
 public:
 
-    std::unique_ptr<program> produceAST(std::string sourceCode){
+    Parser::Parser(std::string);
+    
+    std::unique_ptr<program> Parser::produceAST(std::string sourceCode){
         //able to produce an AST of type program 
         //where each element in the program body is an array of statements. 
         auto Program = std::make_unique<program>();

@@ -40,10 +40,11 @@ struct program : statement{
     program() : statement(PROGRAM){}
 };
 
-//Specialized expr base class
+//Specialized expr base class derived from statement base class 
 struct expr : statement{
     virtual ~expr() = default;
     expr(NodeType nodetype) : statement(nodetype){};
+
 };
 
 struct binaryExpression : expr{
@@ -75,5 +76,33 @@ struct numericLiteral : expr{
         value = val;
     }
 };
+
+class Parser{
+private:
+    //stores tokens of program.
+    std::vector<Token> tokens;
+
+    bool not_eof();
+    //keeps track of index 0;
+
+    Token at();
+    //return previous token and increment
+
+    Token advance();
+    //entry point for parser.
+
+    std::unique_ptr<statement> parse_statement();
+        //already delt with program which is only statement - only expressions to parse
+        //in the future will implement funclaration declaration, variable dec, while loops, etc.
+    std::unique_ptr<expr> parse_expr();
+    std::unique_ptr<expr> parse_primary();
+public:
+    Parser(std::vector<Token> toks);
+
+    std::unique_ptr<program> produceAsr(std::string sourceCode);
+     //able to produce an AST of type program 
+    //where each element in the program body is an array of statements. 
+}
+}
 
 #endif // AST_H
