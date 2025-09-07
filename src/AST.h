@@ -1,107 +1,131 @@
-//FIX AST AND PARSER STRUCTURE.
-
-#ifndef AST_H
-#define AST_H
+#ifndef ASH_H
+#define ASH_H
 
 #include <iostream>
-#include <list>
-#include <algorithm>
-#include <memory>
 #include <vector>
+#include <string>
+#include <memory>
+#include "lexer.h"
+#include <variant>
 
-//var let x = 45; will not return a value
-// x = 45, assignment, will return value
-
-enum NodeType{
+enum nodeType{
     PROGRAM,
-    NUMERIC_LITERAL,
+    STATEMENT,
     IDENTIFIER_EXPR,
-    BINARY_EXPRESSION
+    BINARY_EXPR,
+    NUMERIC_LITERAL
 };
+
+/*
+everything is a statement
+Program extends from a statement
+
+Design practice would be to make an expression its own class extedning from base  class statement
+
+Additionally an expression extends from a statement
+An identifier and numeric literal extend from expression
+
+hope and pray bro... hope and pray
+*/
 
 struct statement{
-    NodeType statementKind;
-
-    statement(NodeType nodetype){
-        statementKind = nodetype; 
+    nodeType statementKind;
+    
+    statement(nodeType kind){
+        statementKind = kind;
     }
-
-    //virtual deconstructor
-    virtual ~statement() = default;
+    ~statement() = default; // include virtual destructor
 };
 
-struct program : statement{
-    //vector of unique statement objects
-    //prevents object slicing
-    // see notes doc for explanation
+struct program : public statement{
+    //a program is made up of a vector of unique pointers of statements
+    //this is going to prevent object slicing.
+
+    //potential usecase.
+    std::variant<nodeType, std::string> progamValues;
+
     std::vector<std::unique_ptr<statement>> programBody;
-
-    //program constructors 
-    program() : statement(PROGRAM){}
+    program() : statement(PROGRAM){};
+    /*
+    Kinda like
+    progarm(){
+        statementKind = PROGRAM;
+    }
+    */
 };
 
-//Specialized expr base class derived from statement base class 
-struct expr : statement{
-    virtual ~expr() = default;
-    expr(NodeType nodetype) : statement(nodetype){};
+struct expr : public statement{
+    //an expression is a statement
+    //an expression can be an identifier, binary expression, or numeric literal
 
+    //value of the expression
+    //for binary expression this is operator
+    std::variant<nodeType, std::string> nodeValue; 
+    //variant can hold either a nodeType (for operators) or a string (for identifiers)
+    expr(nodeType kind, std::variant<nodeType, std::string> val = "") : 
+    statement(kind), nodeValue(val) {
+    };
+
+    /*
+    Just for my own understanding its kinda like this 
+
+    expr(nodeType kind, std::variant<nodeType, std::string> val){
+        statementKind = kind;
+        nodeValue = val;
+    }
+    */
+    ~expr() = default; // include virtual destructor
 };
 
-struct binaryExpression : expr{
-    //left pointer, right pointer, operation
+struct identifier : public expr{
+    std::string symbol;
+
+    identifier(std::string& sym) : expr(IDENTIFIER_EXPR){
+        symbol = std::move(sym);
+    }
+    //no virtual destructor needed since expr already has one
+};
+
+struct binaryExpression : public expr{
     std::unique_ptr<expr> left;
     std::unique_ptr<expr> right;
     std::string operation;
 
-    binaryExpression(std::unique_ptr<expr>left_pointer, 
-        std::unique_ptr<expr>right_pointer, std::string oper_str) : 
-        expr(BINARY_EXPRESSION){
-            //std::move effectively just moves resources from var to var
-            left = std::move(left_pointer);
-            right = std::move(right_pointer);
-            operation = std::move(oper_str);
-        }
-};
-
-struct identifier : expr{
-    std::string symbol;
-    identifier(const std::string& sym) : expr(IDENTIFIER_EXPR){
-        symbol = std::move(sym);
+    binaryExpression(std::unique_ptr<expr> l, std::unique_ptr<expr> r, 
+    std::string& op) : expr(BINARY_EXPR){
+        left = std::move(l);
+        right = std::move(r);
+        operation = std::move(op);
     }
 };
 
-struct numericLiteral : expr{
+struct numericLiteral : public expr{
     double value;
     numericLiteral(double val) : expr(NUMERIC_LITERAL){
         value = val;
     }
 };
 
+//parser class to be implemented.
 class Parser{
 private:
-    //stores tokens of program.
-    std::vector<Token> tokens;
-
-    bool not_eof();
-    //keeps track of index 0;
-
+    //determines if end of file for while loop
+    bool notEOF();
+    //keeps track of index zero of tokens list
     Token at();
-    //return previous token and increment
-
+    //returns previous token and increments to the next
     Token advance();
-    //entry point for parser.
-
     std::unique_ptr<statement> parse_statement();
-        //already delt with program which is only statement - only expressions to parse
-        //in the future will implement funclaration declaration, variable dec, while loops, etc.
     std::unique_ptr<expr> parse_expr();
-    std::unique_ptr<expr> parse_primary();
-public:
-    Parser(std::vector<Token> toks);
+    std::unique_ptr<expr> parse_primaryExpr();
+    std::unique_ptr<expr> parse_binaryExpr();
 
-    std::unique_ptr<program> produceAsr(std::string sourceCode);
-     //able to produce an AST of type program 
-    //where each element in the program body is an array of statements. 
+public:
+    std::unique_ptr<program> produceAST();
+    Parser(std::vector<Token> tk);
+};
+
+#endif // ASH_H 
 }
 }
 
