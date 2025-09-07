@@ -62,8 +62,9 @@ struct expr : public statement{
     //for binary expression this is operator
     std::variant<nodeType, std::string> nodeValue; 
     //variant can hold either a nodeType (for operators) or a string (for identifiers)
-    expr(nodeType kind, std::variant<nodeType, std::string> val) : 
-    statement(kind), nodeValue(val) {};
+    expr(nodeType kind, std::variant<nodeType, std::string> val = "") : 
+    statement(kind), nodeValue(val) {
+    };
 
     /*
     Just for my own understanding its kinda like this 
@@ -107,7 +108,20 @@ struct numericLiteral : public expr{
 
 //parser class to be implemented.
 class Parser{
+private:
+    //determines if end of file for while loop
+    bool notEOF();
+    //keeps track of index zero of tokens list
+    Token at();
+    //returns previous token and increments to the next
+    Token advance();
+    std::unique_ptr<statement> parse_statement();
+    std::unique_ptr<expr> parse_expr();
+    std::unique_ptr<expr> parse_primaryExpr();
+    std::unique_ptr<expr> parse_binaryExpr();
 
+public:
+    std::unique_ptr<program> produceAST();
 };
 
 #endif // ASH_H
