@@ -6,6 +6,8 @@
 #include "lexer.h"
 #include "AST.h"
 
+#include "lexer.h"
+#include "AST.h"
 //vscode is for soyboys.
 
 //supporting commandline agruments idk how ts works bro. 
@@ -30,6 +32,7 @@ int main(int argc, char* argv[]) {
 	std::ofstream output("TokensOut.txt");
 
 	lexer Lexer(sourceCode);
+	
 	std::vector<Token> sourceTokens;
 	sourceTokens = Lexer.tokenize();
 
@@ -40,8 +43,6 @@ int main(int argc, char* argv[]) {
 		output << "{" << tokenTypeToString(sourceTokens[i].type)
 			<< ", " << sourceTokens[i].tokenValue << "}" << ", ";
 	}
-
 	output.close();
-
 	return EXIT_SUCCESS;
 } 
