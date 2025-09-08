@@ -30,9 +30,11 @@ hope and pray bro... hope and pray
 
 struct statement{
     nodeType statementKind;
-    
-    statement(nodeType kind){
+    std::string value;
+
+    statement(nodeType kind, std::string val){
         statementKind = kind;
+        value = val;
     }
     ~statement() = default; // include virtual destructor
 };
@@ -45,7 +47,8 @@ struct program : public statement{
     std::variant<nodeType, std::string> progamValues;
 
     std::vector<std::unique_ptr<statement>> programBody;
-    program() : statement(PROGRAM){};
+
+    program() : statement(PROGRAM, ""){};
     /*
     Kinda like
     progarm(){
@@ -60,10 +63,10 @@ struct expr : public statement{
 
     //value of the expression
     //for binary expression this is operator
-    std::variant<nodeType, std::string> nodeValue; 
+    std::string nodeValue; 
     //variant can hold either a nodeType (for operators) or a string (for identifiers)
     expr(nodeType kind, std::variant<nodeType, std::string> val = "") : 
-    statement(kind), nodeValue(val) {
+    statement(kind, nodeValue) {
     };
 
     /*
@@ -121,6 +124,9 @@ private:
     std::unique_ptr<expr> parse_binaryExpr();
 
 public:
+    std::vector<Token> tokenlist;
+    //takes in vect of tokens to produce ast
+    Parser(std::vector<Token> srcTokens);
     std::unique_ptr<program> produceAST();
 };
 

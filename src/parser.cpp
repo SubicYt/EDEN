@@ -10,73 +10,61 @@
 #include <sstream>
 #include <cctype>
 
-class Parser{
-private:
-    //takes tokens from lexer. 
-    std::vector<Token> tokens;
 
-    bool not_eof(){
-        //evals to true. we are out of tokens to parse.
-        return tokens[0].type != TokenType::END_OF_FILE;
+bool Parser::notEOF(){
+    return tokenlist[0].type != TokenType::END_OF_FILE;
+}
+
+Token Parser::at(){
+    return tokenlist[0];
+}
+
+Token Parser::advance(){
+    if(tokenlist.empty()){
+        throw std::out_of_range("no tokens to parse");
     }
-    //keeps track of index 0;
-    Token at(){
-        return tokens[0];
+    auto prev = tokenlist.front();
+    tokenlist.erase(tokenlist.begin());
+    return prev;
+}
+
+std::unique_ptr<statement> Parser::parse_statement(){
+    //will handle more later
+    return parse_expr();
+}
+
+std::unique_ptr<expr> Parser::parse_expr(){
+    return parse_primaryExpr();
+}
+
+std::unique_ptr<expr> Parser::parse_primaryExpr(){
+    //parsing through a primary expression
+    auto tk = at().type; // token so use type
+    switch(tk){
+        
+        case IDENTIFIER:
+        return std::make_unique<expr>(IDENTIFIER_EXPR, std::to_string(tk));
+        std::cout<<"sucess"<<std::endl;
+
+        case NUMBER:
+        return std::make_unique<expr>(NUMERIC_LITERAL, std::to_string(tk));
+        std::cout<<"succes num"<< std::endl;
+
+        default:
+        throw std::runtime_error("NONVALID TOKEN");
+        std::cout<<"wrong"<<std::endl;
+        std::cout<<tk<<std::endl;
     }
+}
 
-    //return previous token and increment
-    Token advance(){
-        //first check empty
-        if(tokens.empty()){
-            throw std::out_of_range("tokens are empty");
-        }
-        auto prev = tokens.front();
-        tokens.erase(tokens.begin());
-        return prev;
+Parser::Parser(std::vector<Token> srcTokens){
+    tokenlist = srcTokens;
+}
+
+std::unique_ptr<program> Parser::produceAST(){
+    auto Program = std::make_unique<program>();
+    while(notEOF()){
+        Program -> programBody.push_back(parse_statement());
     }
-
-    //entry point for parser.
-    std::unique_ptr<statement> parse_statement(){
-        //already delt with program which is only statment - only expressions to parse
-        //in the future will implement funclaration declaration, variable dec, while loops, etc.
-        return parse_expr();
-    }
-
-    std::unique_ptr<expr> parse_expr(){
-        return parse_primary();
-    }
-
-    std::unique_ptr<expr> parse_primary(){
-        auto tk = at().type;
-        switch(tk){
-            case TokenType::IDENTIFIER:
-            return std::make_unique<expr>(IDENTIFIER, advance().tokenValue);
-
-            case TokenType::NUMBER:
-            return std::make_unique<expr>(NUMERIC_LITERAL, 
-                //parse to float
-                std::stof(advance().tokenValue));
-
-            default: 
-            return 0;
-        }
-
-    }
-
-public:
-    std::unique_ptr<program> produceAST(std::string sourceCode){
-        //able to produce an AST of type program 
-        //where each element in the program body is an array of statements. 
-        auto Program = std::make_unique<program>();
-        lexer Lexer(sourceCode);
-        tokens = Lexer.tokenize();
-
-        //parse until end of file
-        while(not_eof()){
-            Program -> programBody.push_back(parse_statement());
-        }
-
-        return Program;
-    }
-
-};
+    return Program;
+}
