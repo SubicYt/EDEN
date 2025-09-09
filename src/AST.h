@@ -65,7 +65,7 @@ struct expr : public statement{
     //for binary expression this is operator
     std::string nodeValue; 
     //variant can hold either a nodeType (for operators) or a string (for identifiers)
-    expr(nodeType kind, std::variant<nodeType, std::string> val = "") : 
+    expr(nodeType kind, std::string val = "") : 
     statement(kind, nodeValue) {
     };
 
@@ -94,8 +94,11 @@ struct binaryExpression : public expr{
     std::unique_ptr<expr> right;
     std::string operation;
 
-    binaryExpression(std::unique_ptr<expr> l, std::unique_ptr<expr> r, 
-    std::string& op) : expr(BINARY_EXPR){
+    binaryExpression(
+    std::unique_ptr<expr> l, 
+    std::unique_ptr<expr> r, 
+    std::string& op
+    ) : expr(BINARY_EXPR){
         left = std::move(l);
         right = std::move(r);
         operation = std::move(op);

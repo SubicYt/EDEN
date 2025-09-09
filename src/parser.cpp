@@ -38,22 +38,21 @@ std::unique_ptr<expr> Parser::parse_expr(){
 }
 
 std::unique_ptr<expr> Parser::parse_primaryExpr(){
-    //parsing through a primary expression
-    auto tk = at().type; // token so use type
-    switch(tk){
-        
-        case IDENTIFIER:
-        return std::make_unique<expr>(IDENTIFIER_EXPR, std::to_string(tk));
-        std::cout<<"sucess"<<std::endl;
+    auto tk = advance(); //return the first token
+    switch(tk.type){
+        case IDENTIFIER: {
+            return std::make_unique<identifier>(tk.tokenValue);
+        }
+        case NUMBER: {
+            double val = std::stod(tk.tokenValue);
+            return std::make_unique<numericLiteral>(val);
+        }
 
-        case NUMBER:
-        return std::make_unique<expr>(NUMERIC_LITERAL, std::to_string(tk));
-        std::cout<<"succes num"<< std::endl;
-
-        default:
-        throw std::runtime_error("NONVALID TOKEN");
-        std::cout<<"wrong"<<std::endl;
-        std::cout<<tk<<std::endl;
+        default: {
+            throw std::runtime_error("Unexpected node to parse");
+            std::cout<<tk.tokenValue<<std::endl;
+            return nullptr;
+        }
     }
 }
 
