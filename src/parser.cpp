@@ -65,5 +65,9 @@ std::unique_ptr<program> Parser::produceAST(){
     while(notEOF()){
         Program -> programBody.push_back(parse_statement());
     }
+
     return Program;
 }
+
+
+//TODO IS IMPLEMENT A WAY TO PRINT AST. idk yet. recursion
