@@ -1,5 +1,5 @@
 # EDEN - Toy Interpreted Language
-Eden Is a basic interpreted programming language built on C++. Proper documentation is to be implemented upon completion, however I will include
+Eden Is a basic interpreted programming language built on C++. Proper documentation is to be implemented upon completion, however we will include
 what is important to know now. 
 EDEN --version 1.0 will support: 
   - simple high leevel variable declaration and instantiation of types int, double, bool, string, and char.
